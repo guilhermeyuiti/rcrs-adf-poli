@@ -22,6 +22,10 @@ import rescuecore2.standard.entities.Human;
 import rescuecore2.standard.entities.StandardEntity;
 import rescuecore2.standard.entities.StandardEntityURN;
 import rescuecore2.worldmodel.EntityID;
+import rescuecore2.standard.entities.*;
+import rescuecore2.worldmodel.Entity;
+import adf.debug.TestLogger;
+import org.apache.log4j.Logger;
 
 import java.util.*;
 
@@ -36,6 +40,16 @@ public class AmbulanceTargetAllocator
   private Map<EntityID, AmbulanceTeamInfo> ambulanceTeamInfoMap;
   
   private Clustering clustering;
+  private Logger logger;
+  private Collection<StandardEntity> entities;
+  private List<StandardEntity> ruas;
+  private List<StandardEntity> hidrantes;
+  private List<StandardEntity> predios;
+  private List<StandardEntity> refugios;
+  private List<StandardEntity> estacoesgas;
+  private List<StandardEntity> ambulatorios;
+  private List<StandardEntity> estacoesfogo;
+  private List<StandardEntity> delegacias;
   
   public AmbulanceTargetAllocator( AgentInfo ai, WorldInfo wi, ScenarioInfo si, ModuleManager moduleManager, DevelopData developData ) {
     super( ai, wi, si, moduleManager, developData );
@@ -46,6 +60,27 @@ public class AmbulanceTargetAllocator
     this.clustering = moduleManager.getModule(
       "TacticsAmbulanceCentre.TargetAllocator.Clustering",
       "poli.module.algorithm.KMeans");
+
+      this.entities = wi.getEntitiesOfType(
+        StandardEntityURN.ROAD,
+        StandardEntityURN.HYDRANT,
+        StandardEntityURN.BUILDING,
+        StandardEntityURN.REFUGE,
+        StandardEntityURN.GAS_STATION,
+        StandardEntityURN.AMBULANCE_CENTRE,
+        StandardEntityURN.FIRE_STATION,
+        StandardEntityURN.POLICE_OFFICE
+      );
+
+      logger = TestLogger.getLogger(agentInfo.me());
+      this.ruas = new ArrayList<>(wi.getEntitiesOfType(StandardEntityURN.ROAD));
+      this.hidrantes = new ArrayList<>(wi.getEntitiesOfType(StandardEntityURN.HYDRANT));
+      this.predios = new ArrayList<>(wi.getEntitiesOfType(StandardEntityURN.BUILDING));
+      this.refugios = new ArrayList<>(wi.getEntitiesOfType(StandardEntityURN.REFUGE));
+      this.estacoesgas = new ArrayList<>(wi.getEntitiesOfType(StandardEntityURN.GAS_STATION));
+      this.ambulatorios = new ArrayList<>(wi.getEntitiesOfType(StandardEntityURN.AMBULANCE_CENTRE));
+      this.estacoesfogo = new ArrayList<>(wi.getEntitiesOfType(StandardEntityURN.FIRE_STATION));
+      this.delegacias = new ArrayList<>(wi.getEntitiesOfType(StandardEntityURN.POLICE_OFFICE));
   }
   
   
