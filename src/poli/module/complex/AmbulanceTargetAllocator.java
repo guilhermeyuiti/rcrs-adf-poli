@@ -34,7 +34,7 @@ public class AmbulanceTargetAllocator
   
   private Map<EntityID, AmbulanceTeamInfo> ambulanceTeamInfoMap;
   
-  private Clustering clustering;
+  private Collection<EntityID>             clustering;
   
   public AmbulanceTargetAllocator( AgentInfo ai, WorldInfo wi, ScenarioInfo si, ModuleManager moduleManager, DevelopData developData ) {
     super( ai, wi, si, moduleManager, developData );
