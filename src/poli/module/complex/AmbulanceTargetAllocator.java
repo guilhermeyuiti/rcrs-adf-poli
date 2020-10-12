@@ -34,12 +34,17 @@ public class AmbulanceTargetAllocator
   
   private Map<EntityID, AmbulanceTeamInfo> ambulanceTeamInfoMap;
   
+  private Clustering clustering;
   
   public AmbulanceTargetAllocator( AgentInfo ai, WorldInfo wi, ScenarioInfo si, ModuleManager moduleManager, DevelopData developData ) {
     super( ai, wi, si, moduleManager, developData );
     this.priorityHumans = new HashSet<>();
     this.targetHumans = new HashSet<>();
     this.ambulanceTeamInfoMap = new HashMap<>();
+
+    this.clustering = moduleManager.getModule(
+      "TacticsAmbulanceCentre.TargetAllocator.Clustering",
+      "poli.module.algorithm.KMeans");
   }
   
   
