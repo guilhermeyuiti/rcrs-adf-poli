@@ -14,6 +14,7 @@ import adf.agent.info.ScenarioInfo;
 import adf.agent.info.WorldInfo;
 import adf.agent.module.ModuleManager;
 import adf.agent.precompute.PrecomputeData;
+import adf.component.module.algorithm.Clustering;
 import adf.component.communication.CommunicationMessage;
 import rescuecore2.standard.entities.AmbulanceTeam;
 import rescuecore2.standard.entities.Area;
@@ -34,7 +35,7 @@ public class AmbulanceTargetAllocator
   
   private Map<EntityID, AmbulanceTeamInfo> ambulanceTeamInfoMap;
   
-  private Collection<EntityID>             clustering;
+  private Clustering clustering;
   
   public AmbulanceTargetAllocator( AgentInfo ai, WorldInfo wi, ScenarioInfo si, ModuleManager moduleManager, DevelopData developData ) {
     super( ai, wi, si, moduleManager, developData );
