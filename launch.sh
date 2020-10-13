@@ -6,7 +6,7 @@ PARAMS=$*
 cd `dirname $0`
 
 if [ ! -z "$1" ]; then
-  ./gradlew launch --args="${LOADER} ${PARAMS}"
+  bash ./gradlew launch --args="${LOADER} ${PARAMS}"
 else
   echo "Options:"
   echo "-t [FB],[FS],[PF],[PO],[AT],[AC] number of agents"

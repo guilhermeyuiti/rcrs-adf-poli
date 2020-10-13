@@ -81,6 +81,14 @@ public class AmbulanceTargetAllocator
       this.ambulatorios = new ArrayList<>(wi.getEntitiesOfType(StandardEntityURN.AMBULANCE_CENTRE));
       this.estacoesfogo = new ArrayList<>(wi.getEntitiesOfType(StandardEntityURN.FIRE_STATION));
       this.delegacias = new ArrayList<>(wi.getEntitiesOfType(StandardEntityURN.POLICE_OFFICE));
+
+      double area = 0;
+      
+      for (StandardEntity entity : this.predios) {
+        Building predio = (Building) entity;
+        area = area + predio.getTotalArea();
+      }
+      logger.debug("ENTIDADE PREDIOS, AREA TOTAL: " + area);
   }
   
   
