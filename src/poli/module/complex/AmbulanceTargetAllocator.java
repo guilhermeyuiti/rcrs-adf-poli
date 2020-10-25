@@ -14,13 +14,19 @@ import adf.agent.info.ScenarioInfo;
 import adf.agent.info.WorldInfo;
 import adf.agent.module.ModuleManager;
 import adf.agent.precompute.PrecomputeData;
+import adf.component.module.algorithm.Clustering;
 import adf.component.communication.CommunicationMessage;
 import rescuecore2.standard.entities.AmbulanceTeam;
 import rescuecore2.standard.entities.Area;
 import rescuecore2.standard.entities.Human;
 import rescuecore2.standard.entities.StandardEntity;
 import rescuecore2.standard.entities.StandardEntityURN;
+import rescuecore2.standard.score.BuildingDamageScoreFunction;
 import rescuecore2.worldmodel.EntityID;
+import rescuecore2.standard.entities.*;
+import rescuecore2.worldmodel.Entity;
+import adf.debug.TestLogger;
+import org.apache.log4j.Logger;
 
 import java.util.*;
 
@@ -31,18 +37,106 @@ public class AmbulanceTargetAllocator
   
   private Collection<EntityID>             priorityHumans;
   private Collection<EntityID>             targetHumans;
-  
+  private Clustering                       clustering;
+  private Logger                           logger;
   private Map<EntityID, AmbulanceTeamInfo> ambulanceTeamInfoMap;
-  
+
   
   public AmbulanceTargetAllocator( AgentInfo ai, WorldInfo wi, ScenarioInfo si, ModuleManager moduleManager, DevelopData developData ) {
     super( ai, wi, si, moduleManager, developData );
     this.priorityHumans = new HashSet<>();
     this.targetHumans = new HashSet<>();
     this.ambulanceTeamInfoMap = new HashMap<>();
+    logger = TestLogger.getLogger(agentInfo.me());
+
+    switch ( si.getMode() ) {
+      case PRECOMPUTATION_PHASE:
+        this.clustering = moduleManager.getModule(
+          "TacticsAmbulanceCentre.TargetAllocator.Clustering",
+          "poli.module.algorithm.KMeans");
+        break;
+      case PRECOMPUTED:
+        this.clustering = moduleManager.getModule(
+          "TacticsAmbulanceCentre.TargetAllocator.Clustering",
+          "poli.module.algorithm.KMeans");
+        break;
+      case NON_PRECOMPUTE:
+      this.clustering = moduleManager.getModule(
+        "TacticsAmbulanceCentre.TargetAllocator.Clustering",
+        "poli.module.algorithm.KMeans");
+      break;
+    }
+
+    registerModule( this.clustering );
+
+    int sizeCluster = this.clustering.getClusterNumber();  // total de clusters, a princípio 5
+    HashMap <Integer, Double> areaClusters = new HashMap<>();
+
+    // Número do cluster e lista de ambulancias em cada cluster
+    Map<Integer, List<StandardEntity>> ambulanceCluster;
+
+    logger.debug("TOTAL DE CLUSTERS: " + sizeCluster);
+
+    int i;
+    double areaCluster = 0;
+    double areaTotal = 0;
+    double areaBuilding = 0;
+    double countAmbulances = 0;
+    double countTotalAmbulances = 0;
+
+    for (i = 0; i < sizeCluster; i++) {
+      logger.debug("NUMERO DO CLUSTER ATUAL: " + i);
+      areaTotal = 0;
+      countAmbulances = 0;
+      Collection<StandardEntity> elements = this.clustering.getClusterEntities(i);
+      
+      if (elements == null || elements.isEmpty()) {
+        logger.debug("NAO HA ELEMENTOS NO CLUSTER: " + i);
+      }
+      else {
+        logger.debug("TEM ELEMENTOS NO CLUSTER: " + i);
+        for (StandardEntity entity : elements) {
+          if(entity instanceof Building) {
+            areaBuilding = ((Building) entity).getTotalArea();
+            areaCluster += areaBuilding;
+            areaTotal += areaBuilding;
+          }
+          if(entity instanceof AmbulanceTeam) {
+            countAmbulances += 1;
+            countTotalAmbulances +=1;
+          }
+        }
+        areaClusters.put(i, areaCluster);
+      }
+      logger.debug("AREA DOS PREDIOS DO CLUSTER: " + areaCluster);
+      logger.debug("O CLUSTER " + i + " TEM " + countAmbulances + " AMBULANCIAS");
+    }
+    logger.debug("TOTAL DE AMBULANCIAS: " + countTotalAmbulances);
+    logger.debug("AREA TOTAL: " + areaTotal);
+    
+    for (i = 0; i < sizeCluster; i++) {
+      double areaClusterAtual = areaClusters.get(i);
+      double perc = areaClusterAtual/areaTotal;
+      logger.debug("O CLUSTER " + i + " TEM " + perc + "% DA AREA TOTAL");
+
+      double countAmbulanceCluster = Math.round(perc * countTotalAmbulances);
+      logger.debug("O CLUSTER " + i + " DEVE RECEBER " + countAmbulanceCluster + " AMBULANCIAS");
+
+      ArrayList<StandardEntity> ambulances = new ArrayList<StandardEntity>();
+      /*Map<Integer, StandardEntity> centers = this.clustering.getClusterCenter();
+      StandardEntity entity = centers.get(i);
+
+      while (countAmbulanceCluster > 0 ) {
+
+        //IMPLEMENTAR O CALCULO DA AMBULANCIA COM MENOR DISTANCIA E ALOCAR NO AMBULANCLUSTER
+        ambulances.add(entity);
+        ambulanceCluster.put(i, ambulances);
+        countAmbulanceCluster -= 1;
+      }
+*/
+    }
   }
-  
-  
+
   @Override
   public AmbulanceTargetAllocator resume( PrecomputeData precomputeData ) {
     super.resume( precomputeData );

@@ -45,6 +45,7 @@ public class KMeans extends StaticClustering {
   
   private List<StandardEntity>               centerList;
   private List<EntityID>                     centerIDs;
+  private Map<Integer, StandardEntity>       clustersCenter;
   private Map<Integer, List<StandardEntity>> clusterEntitiesList;
   private List<List<EntityID>>               clusterEntityIDsList;
   
@@ -78,6 +79,7 @@ public class KMeans extends StaticClustering {
     this.clusterEntityIDsList = new ArrayList<>();
     this.centerIDs = new ArrayList<>();
     this.clusterEntitiesList = new HashMap<>();
+    this.clustersCenter = new HashMap<>();
     this.centerList = new ArrayList<>();
     this.entities = wi.getEntitiesOfType( StandardEntityURN.ROAD,
         StandardEntityURN.HYDRANT, StandardEntityURN.BUILDING,
@@ -202,7 +204,10 @@ public class KMeans extends StaticClustering {
     return this;
   }
   
-  
+  public Map<Integer, StandardEntity> getClusterCenter() {
+    return this.clustersCenter;
+  }
+
   private void calcStandard( int repeat ) {
     this.initShortestPath( this.worldInfo );
     Random random = new Random();
@@ -210,6 +215,7 @@ public class KMeans extends StaticClustering {
     List<StandardEntity> entityList = new ArrayList<>( this.entities );
     this.centerList = new ArrayList<>( this.clusterSize );
     this.clusterEntitiesList = new HashMap<>( this.clusterSize );
+    this.clustersCenter = new HashMap<>( this.clusterSize );
     
     // init list
     for ( int index = 0; index < this.clusterSize; index++ ) {
@@ -225,6 +231,7 @@ public class KMeans extends StaticClustering {
         centerEntity = entityList
             .get( Math.abs( random.nextInt() ) % entityList.size() );
       } while ( this.centerList.contains( centerEntity ) );
+      this.clustersCenter.put(index, centerEntity);
       this.centerList.set( index, centerEntity );
     }
     // calc center
