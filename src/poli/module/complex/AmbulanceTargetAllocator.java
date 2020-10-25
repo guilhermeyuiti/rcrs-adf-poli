@@ -123,7 +123,7 @@ public class AmbulanceTargetAllocator
       logger.debug("O CLUSTER " + i + " DEVE RECEBER " + countAmbulanceCluster + " AMBULANCIAS");
 
       ArrayList<StandardEntity> ambulances = new ArrayList<StandardEntity>();
-      /*Map<Integer, StandardEntity> centers = this.clustering.getClusterCenter();
+      Map<Integer, StandardEntity> centers = this.clustering.getClusterCenter();
       StandardEntity entity = centers.get(i);
 
       while (countAmbulanceCluster > 0 ) {
@@ -133,7 +133,7 @@ public class AmbulanceTargetAllocator
         ambulanceCluster.put(i, ambulances);
         countAmbulanceCluster -= 1;
       }
-*/
+
     }
   }
 
