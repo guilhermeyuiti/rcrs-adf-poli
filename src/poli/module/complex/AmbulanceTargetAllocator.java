@@ -120,7 +120,7 @@ public class AmbulanceTargetAllocator
     for (i = 0; i < sizeCluster; i++) {
       double areaClusterAtual = areaClusters.get(i);
       double perc = areaClusterAtual/areaTotal;
-      logger.debug("O CLUSTER " + i + " TEM " + perc + "% DA AREA TOTAL");
+      logger.debug("O CLUSTER " + i + " TEM " + perc * 100 + "% DA AREA TOTAL");
 
       double countAmbulanceCluster = Math.round(perc * countTotalAmbulances);
       logger.debug("O CLUSTER " + i + " DEVE RECEBER " + countAmbulanceCluster + " AMBULANCIAS");
