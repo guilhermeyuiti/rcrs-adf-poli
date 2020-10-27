@@ -26,6 +26,8 @@ import rescuecore2.worldmodel.EntityID;
 import rescuecore2.standard.entities.*;
 import rescuecore2.worldmodel.Entity;
 import adf.debug.TestLogger;
+import poli.module.algorithm.PoliClustering;
+
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -37,7 +39,7 @@ public class AmbulanceTargetAllocator
   
   private Collection<EntityID>             priorityHumans;
   private Collection<EntityID>             targetHumans;
-  private Clustering                       clustering;
+  private PoliClustering                   clustering;
   private Logger                           logger;
   private Map<EntityID, AmbulanceTeamInfo> ambulanceTeamInfoMap;
 
@@ -68,12 +70,13 @@ public class AmbulanceTargetAllocator
     }
 
     registerModule( this.clustering );
+    this.clustering.preparate();
 
     int sizeCluster = this.clustering.getClusterNumber();  // total de clusters, a princípio 5
     HashMap <Integer, Double> areaClusters = new HashMap<>();
 
     // Número do cluster e lista de ambulancias em cada cluster
-    Map<Integer, List<StandardEntity>> ambulanceCluster;
+    Map<Integer, List<StandardEntity>> ambulanceCluster = new HashMap<Integer, List<StandardEntity>>();
 
     logger.debug("TOTAL DE CLUSTERS: " + sizeCluster);
 
@@ -86,7 +89,7 @@ public class AmbulanceTargetAllocator
 
     for (i = 0; i < sizeCluster; i++) {
       logger.debug("NUMERO DO CLUSTER ATUAL: " + i);
-      areaTotal = 0;
+      areaCluster = 0;
       countAmbulances = 0;
       Collection<StandardEntity> elements = this.clustering.getClusterEntities(i);
       
@@ -133,7 +136,6 @@ public class AmbulanceTargetAllocator
         ambulanceCluster.put(i, ambulances);
         countAmbulanceCluster -= 1;
       }
-
     }
   }
 

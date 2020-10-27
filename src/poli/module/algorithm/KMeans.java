@@ -31,7 +31,7 @@ import rescuecore2.standard.entities.StandardEntityURN;
 import rescuecore2.worldmodel.Entity;
 import rescuecore2.worldmodel.EntityID;
 
-public class KMeans extends StaticClustering {
+public class KMeans extends PoliClustering {
   
   private static final String                KEY_CLUSTER_SIZE   = "clustering.size";
   private static final String                KEY_CLUSTER_CENTER = "clustering.centers";
