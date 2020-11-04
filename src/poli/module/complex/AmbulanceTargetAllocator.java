@@ -143,6 +143,9 @@ public class AmbulanceTargetAllocator
       }
       ambulanceCluster.put(i, ambulances); // para o cluster i, associar a lista de ambulancias
     }
+    for (Map.Entry<Integer, List<StandardEntity>> entry : ambulanceCluster.entrySet()) {
+      logger.debug("O CLUSTER É: " + (entry.getKey()) + " E SUAS AMBULANCIAS SAO: " + (entry.getValue()));
+    }
   }
 
   @Override
