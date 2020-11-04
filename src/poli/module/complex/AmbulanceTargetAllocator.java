@@ -185,11 +185,11 @@ public class AmbulanceTargetAllocator
   
   @Override
   public AmbulanceTargetAllocator calc() {
-    List<StandardEntity> agents = this.getActionAgents( this.ambulanceTeamInfoMap );
     Collection<EntityID> removes = new ArrayList<>();
     int currentTime = this.agentInfo.getTime();
 
     for ( EntityID target : this.priorityHumans ) { // para targets prioritarios
+      List<StandardEntity> agents = this.getActionAgents( this.ambulanceTeamInfoMap );
       List<StandardEntity> ambulances = this.ambulanceCluster.get(this.clustering.getClusterIndex(target)); // ambulances é a lista de ambulancias no cluster em que a vítima está
 
       for (StandardEntity ambulance : ambulances) { // percorro todas as ambulâncias que estão no cluster do target
@@ -222,7 +222,7 @@ public class AmbulanceTargetAllocator
     removes.clear();
 
     for ( EntityID target : this.targetHumans ) { // para targets NÃO prioritarios
-
+      List<StandardEntity> agents = this.getActionAgents( this.ambulanceTeamInfoMap );
       List<StandardEntity> ambulances = this.ambulanceCluster.get(this.clustering.getClusterIndex(target)); // ambulances é a lista de ambulancias no cluster em que a vítima está
 
       for (StandardEntity ambulance : ambulances) { // percorro todas as ambulâncias que estão no cluster do target
