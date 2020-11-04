@@ -197,23 +197,22 @@ public class AmbulanceTargetAllocator
         if ( info != null && (info.canNewAction == false || this.clustering.getClusterIndex(ambulance) != this.clustering.getClusterIndex(target))) { // se a ambulancia não pode realizar uma nova ação ou não estiver no cluster do target, elimino
           agents.remove(ambulance);
         }
-      }
-
-      if ( agents.size() > 0 ) {
-        StandardEntity targetEntity = this.worldInfo.getEntity( target );
-        if ( targetEntity != null && targetEntity instanceof Human
-            && ( (Human) targetEntity ).isPositionDefined() ) {
-          agents.sort( new DistanceSorter( this.worldInfo, targetEntity ) );
-          StandardEntity result = agents.get( 0 );
-          agents.remove( 0 );
-          AmbulanceTeamInfo info = this.ambulanceTeamInfoMap
-              .get( result.getID() );
-          if ( info != null ) {
-            info.canNewAction = false;
-            info.target = target;
-            info.commandTime = currentTime;
-            this.ambulanceTeamInfoMap.put( result.getID(), info );
-            removes.add( target );
+        if ( agents.size() > 0 ) {
+          StandardEntity targetEntity = this.worldInfo.getEntity( target );
+          if ( targetEntity != null && targetEntity instanceof Human
+              && ( (Human) targetEntity ).isPositionDefined() ) {
+            agents.sort( new DistanceSorter( this.worldInfo, targetEntity ) );
+            StandardEntity result = agents.get( 0 );
+            agents.remove( 0 );
+            info = this.ambulanceTeamInfoMap
+                .get( result.getID() );
+            if ( info != null ) {
+              info.canNewAction = false;
+              info.target = target;
+              info.commandTime = currentTime;
+              this.ambulanceTeamInfoMap.put( result.getID(), info );
+              removes.add( target );
+            }
           }
         }
       }
@@ -231,23 +230,22 @@ public class AmbulanceTargetAllocator
         if ( info != null && (info.canNewAction == false || this.clustering.getClusterIndex(ambulance) != this.clustering.getClusterIndex(target))) { // se a ambulancia não pode realizar uma nova ação ou não estiver no cluster do target, elimino
           agents.remove(ambulance);
         }
-      }
-
-      if ( agents.size() > 0 ) {
-        StandardEntity targetEntity = this.worldInfo.getEntity( target );
-        if ( targetEntity != null && targetEntity instanceof Human
-            && ( (Human) targetEntity ).isPositionDefined() ) {
-          agents.sort( new DistanceSorter( this.worldInfo, targetEntity ) );
-          StandardEntity result = agents.get( 0 );
-          agents.remove( 0 );
-          AmbulanceTeamInfo info = this.ambulanceTeamInfoMap
-              .get( result.getID() );
-          if ( info != null ) {
-            info.canNewAction = false;
-            info.target = target;
-            info.commandTime = currentTime;
-            this.ambulanceTeamInfoMap.put( result.getID(), info );
-            removes.add( target );
+        if ( agents.size() > 0 ) {
+          StandardEntity targetEntity = this.worldInfo.getEntity( target );
+          if ( targetEntity != null && targetEntity instanceof Human
+              && ( (Human) targetEntity ).isPositionDefined() ) {
+            agents.sort( new DistanceSorter( this.worldInfo, targetEntity ) );
+            StandardEntity result = agents.get( 0 );
+            agents.remove( 0 );
+            info = this.ambulanceTeamInfoMap
+                .get( result.getID() );
+            if ( info != null ) {
+              info.canNewAction = false;
+              info.target = target;
+              info.commandTime = currentTime;
+              this.ambulanceTeamInfoMap.put( result.getID(), info );
+              removes.add( target );
+            }
           }
         }
       }
