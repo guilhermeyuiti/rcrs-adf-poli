@@ -185,12 +185,20 @@ public class AmbulanceTargetAllocator
   
   @Override
   public AmbulanceTargetAllocator calc() {
-    List<StandardEntity> agents = this
-        .getActionAgents( this.ambulanceTeamInfoMap );
+    List<StandardEntity> agents = this.getActionAgents( this.ambulanceTeamInfoMap );
     Collection<EntityID> removes = new ArrayList<>();
     int currentTime = this.agentInfo.getTime();
-    for ( EntityID target : this.priorityHumans ) {
+
+    for ( EntityID target : this.priorityHumans ) { // para targets prioritarios
       List<StandardEntity> ambulances = this.ambulanceCluster.get(this.clustering.getClusterIndex(target)); // ambulances é a lista de ambulancias no cluster em que a vítima está
+
+      for (StandardEntity ambulance : ambulances) { // percorro todas as ambulâncias que estão no cluster do target
+        AmbulanceTeamInfo info = this.ambulanceTeamInfoMap.get( ambulance.getID() );
+        if ( info != null && (info.canNewAction == false || this.clustering.getClusterIndex(ambulance) != this.clustering.getClusterIndex(target))) { // se a ambulancia não pode realizar uma nova ação ou não estiver no cluster do target, elimino
+          agents.remove(ambulance);
+        }
+      }
+
       if ( agents.size() > 0 ) {
         StandardEntity targetEntity = this.worldInfo.getEntity( target );
         if ( targetEntity != null && targetEntity instanceof Human
@@ -210,9 +218,21 @@ public class AmbulanceTargetAllocator
         }
       }
     }
+
     this.priorityHumans.removeAll( removes );
     removes.clear();
-    for ( EntityID target : this.targetHumans ) {
+
+    for ( EntityID target : this.targetHumans ) { // para targets NÃO prioritarios
+
+      List<StandardEntity> ambulances = this.ambulanceCluster.get(this.clustering.getClusterIndex(target)); // ambulances é a lista de ambulancias no cluster em que a vítima está
+
+      for (StandardEntity ambulance : ambulances) { // percorro todas as ambulâncias que estão no cluster do target
+        AmbulanceTeamInfo info = this.ambulanceTeamInfoMap.get( ambulance.getID() );
+        if ( info != null && (info.canNewAction == false || this.clustering.getClusterIndex(ambulance) != this.clustering.getClusterIndex(target))) { // se a ambulancia não pode realizar uma nova ação ou não estiver no cluster do target, elimino
+          agents.remove(ambulance);
+        }
+      }
+
       if ( agents.size() > 0 ) {
         StandardEntity targetEntity = this.worldInfo.getEntity( target );
         if ( targetEntity != null && targetEntity instanceof Human
