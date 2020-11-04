@@ -73,10 +73,10 @@ public class AmbulanceTargetAllocator
     this.clustering.preparate();
 
     int sizeCluster = this.clustering.getClusterNumber();  // total de clusters, a princípio 5
-    HashMap <Integer, Double> areaClusters = new HashMap<>();
+    HashMap <Integer, Double> areaClusters = new HashMap<>(); // para cada número de cluster, indica a área dos prédios desse cluster
 
-    // Número do cluster e lista de ambulancias em cada cluster
-    Map<Integer, List<StandardEntity>> ambulanceCluster = new HashMap<Integer, List<StandardEntity>>();
+    Map<Integer, List<StandardEntity>> ambulanceCluster = new HashMap<Integer, List<StandardEntity>>(); // Número do cluster e lista de ambulancias associadas a cada cluster
+    ArrayList<StandardEntity> ambulancesTemp = new ArrayList<StandardEntity>(); // inicializo uma lista de ambulancias temporaria
 
     logger.debug("TOTAL DE CLUSTERS: " + sizeCluster);
 
@@ -101,12 +101,13 @@ public class AmbulanceTargetAllocator
         for (StandardEntity entity : elements) {
           if(entity instanceof Building) {
             areaBuilding = ((Building) entity).getTotalArea();
-            areaCluster += areaBuilding;
-            areaTotal += areaBuilding;
+            areaCluster += areaBuilding;  // Área dos prédios do cluster
+            areaTotal += areaBuilding;    // Área total dos pŕedios
           }
           if(entity instanceof AmbulanceTeam) {
-            countAmbulances += 1;
-            countTotalAmbulances +=1;
+            countAmbulances += 1;    // Qtad de ambulâncias no cluster
+            countTotalAmbulances +=1;  // Qtad total de ambulâncias
+            ambulancesTemp.add(entity);  // salvo cada ambulancia nessa lista
           }
         }
         areaClusters.put(i, areaCluster);
@@ -117,6 +118,8 @@ public class AmbulanceTargetAllocator
     logger.debug("TOTAL DE AMBULANCIAS: " + countTotalAmbulances);
     logger.debug("AREA TOTAL: " + areaTotal);
     
+    double availableAmbulances = countTotalAmbulances;
+
     for (i = 0; i < sizeCluster; i++) {
       double areaClusterAtual = areaClusters.get(i);
       double perc = areaClusterAtual/areaTotal;
@@ -125,17 +128,20 @@ public class AmbulanceTargetAllocator
       double countAmbulanceCluster = Math.round(perc * countTotalAmbulances);
       logger.debug("O CLUSTER " + i + " DEVE RECEBER " + countAmbulanceCluster + " AMBULANCIAS");
 
-      ArrayList<StandardEntity> ambulances = new ArrayList<StandardEntity>();
+      ArrayList<StandardEntity> ambulances = new ArrayList<StandardEntity>(); // inicializo uma lista de ambulancias
+
       Map<Integer, StandardEntity> centers = this.clustering.getClusterCenter();
-      StandardEntity entity = centers.get(i);
+      StandardEntity entityCenter = centers.get(i);  // Entidade centroide da partição i
 
-      while (countAmbulanceCluster > 0 ) {
-
-        //IMPLEMENTAR O CALCULO DA AMBULANCIA COM MENOR DISTANCIA E ALOCAR NO AMBULANCLUSTER
-        ambulances.add(entity);
-        ambulanceCluster.put(i, ambulances);
+      // CALCULO DA AMBULANCIA COM MENOR DISTANCIA E ALOCAR NO AMBULANCECLUSTER
+      while (countAmbulanceCluster > 0 && availableAmbulances > 0) {
+        StandardEntity closestAmbulance = this.clustering.getNearEntity( this.worldInfo, ambulancesTemp, entityCenter ); // encontra a ambulância mais próxima do centroide da partição
+        ambulancesTemp.remove(closestAmbulance);  // remove essa ambulancia pois ela já foi alocada e não pode ser alocada de novo
+        ambulances.add(closestAmbulance);  // adiciono a ambulancia mais próxima na lista de ambulâncias
         countAmbulanceCluster -= 1;
+        availableAmbulances -= 1;
       }
+      ambulanceCluster.put(i, ambulances); // para o cluster i, associar a lista de ambulancias
     }
   }
 

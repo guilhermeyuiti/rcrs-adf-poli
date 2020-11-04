@@ -537,7 +537,7 @@ public class KMeans extends PoliClustering {
   }
   
   
-  private StandardEntity getNearEntity( WorldInfo worldInfo,
+  public StandardEntity getNearEntity( WorldInfo worldInfo,
       List<StandardEntity> srcEntityList, StandardEntity targetEntity ) {
     StandardEntity result = null;
     for ( StandardEntity entity : srcEntityList ) {
