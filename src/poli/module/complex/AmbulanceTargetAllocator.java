@@ -42,6 +42,7 @@ public class AmbulanceTargetAllocator
   private PoliClustering                   clustering;
   private Logger                           logger;
   private Map<EntityID, AmbulanceTeamInfo> ambulanceTeamInfoMap;
+  private Map<Integer, List<StandardEntity>>  ambulanceCluster;
 
   
   public AmbulanceTargetAllocator( AgentInfo ai, WorldInfo wi, ScenarioInfo si, ModuleManager moduleManager, DevelopData developData ) {
@@ -75,7 +76,7 @@ public class AmbulanceTargetAllocator
     int sizeCluster = this.clustering.getClusterNumber();  // total de clusters, a princípio 5
     HashMap <Integer, Double> areaClusters = new HashMap<>(); // para cada número de cluster, indica a área dos prédios desse cluster
 
-    Map<Integer, List<StandardEntity>> ambulanceCluster = new HashMap<Integer, List<StandardEntity>>(); // Número do cluster e lista de ambulancias associadas a cada cluster
+    this.ambulanceCluster = new HashMap<Integer, List<StandardEntity>>(); // Número do cluster e lista de ambulancias associadas a cada cluster
     ArrayList<StandardEntity> ambulancesTemp = new ArrayList<StandardEntity>(); // inicializo uma lista de ambulancias temporaria
 
     logger.debug("TOTAL DE CLUSTERS: " + sizeCluster);
@@ -189,6 +190,7 @@ public class AmbulanceTargetAllocator
     Collection<EntityID> removes = new ArrayList<>();
     int currentTime = this.agentInfo.getTime();
     for ( EntityID target : this.priorityHumans ) {
+      List<StandardEntity> ambulances = this.ambulanceCluster.get(this.clustering.getClusterIndex(target)); // ambulances é a lista de ambulancias no cluster em que a vítima está
       if ( agents.size() > 0 ) {
         StandardEntity targetEntity = this.worldInfo.getEntity( target );
         if ( targetEntity != null && targetEntity instanceof Human
