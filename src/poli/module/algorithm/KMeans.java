@@ -9,6 +9,8 @@ import adf.agent.module.ModuleManager;
 import adf.agent.precompute.PrecomputeData;
 import adf.component.module.algorithm.Clustering;
 import adf.component.module.algorithm.StaticClustering;
+import firesimulator.world.Refuge;
+
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,17 +49,21 @@ public class KMeans extends PoliClustering {
   private List<EntityID>                     centerIDs;
   private Map<Integer, StandardEntity>       clustersCenter;
   private Map<Integer, List<StandardEntity>> clusterEntitiesList;
+
   private List<List<EntityID>>               clusterEntityIDsList;
+
   
   private int                                clusterSize;
   
   private boolean                            assignAgentsFlag;
+
   
   private Map<EntityID, Set<EntityID>>       shortestPathGraph;
   
   
   public KMeans( AgentInfo ai, WorldInfo wi, ScenarioInfo si, ModuleManager moduleManager, DevelopData developData ) {
     super( ai, wi, si, moduleManager, developData );
+
     this.repeatPrecompute = developData
         .getInteger( "poli.module.KMeans.repeatPrecompute", 7 );
     this.repeatPreparate = developData
@@ -81,6 +87,7 @@ public class KMeans extends PoliClustering {
     this.clusterEntitiesList = new HashMap<>();
     this.clustersCenter = new HashMap<>();
     this.centerList = new ArrayList<>();
+
     this.entities = wi.getEntitiesOfType( StandardEntityURN.ROAD,
         StandardEntityURN.HYDRANT, StandardEntityURN.BUILDING,
         StandardEntityURN.REFUGE, StandardEntityURN.GAS_STATION,
@@ -169,11 +176,50 @@ public class KMeans extends PoliClustering {
   
   @Override
   public int getClusterIndex( EntityID id ) {
+    // ########## CASO 1 : ENTIDADE DEFINIDA EM UM CLUSTER ###############
     for ( int i = 0; i < this.clusterSize; i++ ) {
       if ( this.clusterEntityIDsList.get( i ).contains( id ) ) {
-        return i;
+        return i;  // a entidade está em um cluster i
       }
     }
+
+    // ########## CASO 2 : ENTIDADE NÃO DEFINIDA EM UM CLUSTER ###############
+    ArrayList<StandardEntity> civisTemp = new ArrayList<StandardEntity>(); 
+    List<EntityID> list = new ArrayList<EntityID>(); 
+
+    int countHumans = 0;
+
+    for (int i = 0; i < this.clusterSize; i++) {
+      Collection<StandardEntity> elements = getClusterEntities(i);
+      for (StandardEntity entity : elements) {
+        if(entity instanceof Human) {
+          countHumans += 1;    // Qtad de civis no cluster
+          civisTemp.add(entity);  // salvo cada civil nessa lista
+        }
+      }
+    }
+
+    for (int i = 0; i < this.clusterSize; i++) {
+      Map<Integer, StandardEntity> centers = getClusterCenter();
+      StandardEntity entityCenter = centers.get(i);  // Entidade centroide da partição i
+
+      while (countHumans > 0) {
+        StandardEntity closestHuman = getNearEntity( this.worldInfo, civisTemp, entityCenter ); // encontra o civil mais próxima do centroide da partição
+        civisTemp.remove(closestHuman);
+        list.add(closestHuman.getID());
+        countHumans = countHumans - 1;
+      }
+
+      clusterEntityIDsList.add(i, list); // para o cluster i, associar a lista de civis
+    }
+
+    // ########## VERIFICO CASO 1 DE NOVO ###############
+    for ( int i = 0; i < this.clusterSize; i++ ) {
+      if ( this.clusterEntityIDsList.get( i ).contains( id ) ) {
+        return i;  // a entidade está em um cluster i
+      }
+    }
+    // ########## CASO 3: NÃO ENCONTRADO ###############
     return -1;
   }
   

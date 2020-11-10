@@ -193,26 +193,28 @@ public class AmbulanceTargetAllocator
       List<StandardEntity> ambulances = this.ambulanceCluster.get(this.clustering.getClusterIndex(target)); // ambulances é a lista de ambulancias no cluster em que a vítima está
 
       for (StandardEntity ambulance : ambulances) { // percorro todas as ambulâncias que estão no cluster do target
-        AmbulanceTeamInfo info = this.ambulanceTeamInfoMap.get( ambulance.getID() );
+        StandardEntity result = agents.get(this.clustering.getClusterIndex(ambulance));
+        AmbulanceTeamInfo info = this.ambulanceTeamInfoMap.get( result.getID() );
+
         if ( info != null && (info.canNewAction == false || this.clustering.getClusterIndex(ambulance) != this.clustering.getClusterIndex(target))) { // se a ambulancia não pode realizar uma nova ação ou não estiver no cluster do target, elimino
-          agents.remove(ambulance);
+          agents.remove(this.clustering.getClusterIndex(ambulance));
         }
-        if ( agents.size() > 0 ) {
-          StandardEntity targetEntity = this.worldInfo.getEntity( target );
-          if ( targetEntity != null && targetEntity instanceof Human
-              && ( (Human) targetEntity ).isPositionDefined() ) {
-            agents.sort( new DistanceSorter( this.worldInfo, targetEntity ) );
-            StandardEntity result = agents.get( 0 );
-            agents.remove( 0 );
-            info = this.ambulanceTeamInfoMap
-                .get( result.getID() );
-            if ( info != null ) {
-              info.canNewAction = false;
-              info.target = target;
-              info.commandTime = currentTime;
-              this.ambulanceTeamInfoMap.put( result.getID(), info );
-              removes.add( target );
-            }
+      }
+      if ( agents.size() > 0 ) {
+        StandardEntity targetEntity = this.worldInfo.getEntity( target );
+        if ( targetEntity != null && targetEntity instanceof Human
+            && ( (Human) targetEntity ).isPositionDefined() ) {
+          agents.sort( new DistanceSorter( this.worldInfo, targetEntity ) );
+          StandardEntity result = agents.get( 0 );
+          agents.remove( 0 );
+          AmbulanceTeamInfo info = this.ambulanceTeamInfoMap
+          .get( result.getID() );
+          if ( info != null ) {
+            info.canNewAction = false;
+            info.target = target;
+            info.commandTime = currentTime;
+            this.ambulanceTeamInfoMap.put( result.getID(), info );
+            removes.add( target );
           }
         }
       }
@@ -224,28 +226,31 @@ public class AmbulanceTargetAllocator
     for ( EntityID target : this.targetHumans ) { // para targets NÃO prioritarios
       List<StandardEntity> agents = this.getActionAgents( this.ambulanceTeamInfoMap );
       List<StandardEntity> ambulances = this.ambulanceCluster.get(this.clustering.getClusterIndex(target)); // ambulances é a lista de ambulancias no cluster em que a vítima está
+      logger.debug("SINALIZADOR " + this.clustering.getClusterIndex(target));
 
       for (StandardEntity ambulance : ambulances) { // percorro todas as ambulâncias que estão no cluster do target
-        AmbulanceTeamInfo info = this.ambulanceTeamInfoMap.get( ambulance.getID() );
+        StandardEntity result = agents.get(this.clustering.getClusterIndex(ambulance));
+        AmbulanceTeamInfo info = this.ambulanceTeamInfoMap.get( result.getID() );
+
         if ( info != null && (info.canNewAction == false || this.clustering.getClusterIndex(ambulance) != this.clustering.getClusterIndex(target))) { // se a ambulancia não pode realizar uma nova ação ou não estiver no cluster do target, elimino
-          agents.remove(ambulance);
+          agents.remove(this.clustering.getClusterIndex(ambulance));
         }
-        if ( agents.size() > 0 ) {
-          StandardEntity targetEntity = this.worldInfo.getEntity( target );
-          if ( targetEntity != null && targetEntity instanceof Human
-              && ( (Human) targetEntity ).isPositionDefined() ) {
-            agents.sort( new DistanceSorter( this.worldInfo, targetEntity ) );
-            StandardEntity result = agents.get( 0 );
-            agents.remove( 0 );
-            info = this.ambulanceTeamInfoMap
-                .get( result.getID() );
-            if ( info != null ) {
-              info.canNewAction = false;
-              info.target = target;
-              info.commandTime = currentTime;
-              this.ambulanceTeamInfoMap.put( result.getID(), info );
-              removes.add( target );
-            }
+      }
+      if ( agents.size() > 0 ) {
+        StandardEntity targetEntity = this.worldInfo.getEntity( target );
+        if ( targetEntity != null && targetEntity instanceof Human
+            && ( (Human) targetEntity ).isPositionDefined() ) {
+          agents.sort( new DistanceSorter( this.worldInfo, targetEntity ) );
+          StandardEntity result = agents.get( 0 );
+          agents.remove( 0 );
+          AmbulanceTeamInfo info = this.ambulanceTeamInfoMap
+          .get( result.getID() );
+          if ( info != null ) {
+            info.canNewAction = false;
+            info.target = target;
+            info.commandTime = currentTime;
+            this.ambulanceTeamInfoMap.put( result.getID(), info );
+            removes.add( target );
           }
         }
       }
